@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat App</title>
+</head>
+<body>
+  <h1>Chat App</h1>
+  <form action="/chat" method="post">
+    <label for="user">User:</label>
+    <input type="text" name="user" id="user" />
+    <br />
+    <label for="message">Message:</label>
+    <textarea name="message" id="message"></textarea>
+    <br />
+    <input type="submit" value="Send" />
+  </form>
+  <div id="chat-messages"></div>
+</body>
+<script>
+  const chatMessagesElement = document.getElementById('chat-messages');
+
+  function appendChatMessage(user, message, correctedMessage) {
+    const chatMessageElement = document.createElement('div');
+    chatMessageElement.innerHTML = `
+      <b>${user}:</b> ${message}
+      <br />
+      <i>(Corrected: ${correctedMessage})</i>
+    `;
+
+    chatMessagesElement.appendChild(chatMessageElement);
+  }
+
+  const formElement = document.querySelector('form');
+  formElement.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const user = formData.get('user');
+    const message = formData.get('message');
+
+    const response = await fetch('/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user,
+        message,
+      }),
+    });
+
+    const data = await response.json();
+
+    appendChatMessage(user, message, data.correctedMessage);
+  });
+</script>
+</html>
